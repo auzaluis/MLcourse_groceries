@@ -5,7 +5,7 @@ library(arules)
 library(arulesViz)
 library(viridis)
 
-# Impotar el DF ----
+# Importar el DF ----
 
 DF <- read.csv(text = gsheet2text(url = "https://docs.google.com/spreadsheets/d/1NTjA8nrmcWltvZn4oq5KJK7-R4Mb-_is_5vVsoBDCv0/edit?usp=sharing",
                                   format = "csv"),
@@ -41,9 +41,51 @@ class(DF.trans)
 
 itemFrequencyPlot(x = DF.trans,
                   type = "relative",
-                  topN = 10,
-                  col = viridis(n = 10),
+                  topN = 15,
+                  col = viridis(n = 15),
                   horiz = T)
 
 
 
+# Reglas ----
+
+rules <- apriori(data = DF.trans,
+                 parameter = list(supp = 0.0005,
+                                  conf = 0.15,
+                                  minlen = 2,
+                                  maxlen = 3))
+  
+# Resultados ----
+inspect(rules)  
+  
+plot(rules,
+     method = "graph",
+     engine = "htmlwidget")
+
+
+
+## Fijando la mano izquierda ----
+
+rules.lhs <- apriori(data = DF.trans,
+                     parameter = list(supp = 0.001,
+                                      conf = 0.05,
+                                      minlen = 2,
+                                      maxlen = 3),
+                     appearance = list(lhs = "whole milk",
+                                       default = "rhs"))
+
+inspect(rules.lhs)
+
+
+
+## Fijando la mano derecha ----
+
+rules.rhs <- apriori(data = DF.trans,
+                     parameter = list(supp = 0.001,
+                                      conf = 0.07,
+                                      minlen = 2,
+                                      maxlen = 2),
+                     appearance = list(rhs = "sausage",
+                                       default = "lhs"))
+
+inspect(rules.rhs)
